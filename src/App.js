@@ -8,11 +8,11 @@ import Combine from './components/Combine';
 function App() {
   return (
     <div className="App">
-    {/* <Disperse />  */}
-      <OnSubmit />
+    <Disperse /> 
+      {/* <OnSubmit />
     <DuplicateError />
     <ValidNumbersValidator />
-    <Combine />
+    <Combine /> */}
     </div>
   );
 }

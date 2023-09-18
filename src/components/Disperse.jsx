@@ -1,167 +1,248 @@
 
+
+// import React, { useState } from 'react';
+
+// function MergeComponents() {
+//   const [inputText, setInputText] = useState('');
+//   const [error, setError] = useState(null);
+//   const [result, setResult] = useState(null);
+//   const [addressValueMap, setAddressValueMap] = useState(new Map());
+
+//   const handleInputChange = (e) => {
+//     setInputText(e.target.value);
+//     setError(null);
+//     setResult(null);
+//     setAddressValueMap(new Map());
+//   };
+
+//   const validateInput = () => {
+//     const lines = inputText.split('\n').filter((line) => line.trim() !== '');
+//     const newAddressValueMap = new Map();
+//     const errors = [];
+//     const validAddresses = [];
+
+//     for (let i = 0; i < lines.length; i++) {
+//       const line = lines[i].trim();
+//       const parts = line.split(/[=, ]+/); // Split by '=', space, or comma
+
+//       if (parts.length === 2) {
+//         const [address, value] = parts;
+//         const intValue = parseInt(value, 10);
+
+//         if (!/^0x[0-9a-fA-F]{40}$/.test(address)) {
+//           errors.push(`Line ${i + 1}: Invalid Ethereum address: ${address}`);
+//         } else if (isNaN(intValue)) {
+//           errors.push(`Line ${i + 1}: Invalid value: ${value}`);
+//         } else {
+//           if (newAddressValueMap.has(address)) {
+//             errors.push(`Line ${i + 1}: Address ${address} encountered duplicates.`);
+//           } else {
+//             newAddressValueMap.set(address, intValue);
+//             validAddresses.push({ address, amount: intValue });
+//           }
+//         }
+//       } else {
+//         errors.push(`Line ${i + 1}: Incorrect format: ${line}`);
+//       }
+//     }
+
+//     if (errors.length > 0) {
+//       setError(errors.join('\n'));
+//       setResult(null);
+//       setAddressValueMap(new Map());
+//     } else {
+//       setResult(validAddresses);
+//       setAddressValueMap(newAddressValueMap);
+//       setError(null);
+//     }
+//   };
+
+//   return (
+//     <div className="container" style={{ width: '60vw' }}>
+//       <h4 className="mt-3" style={{ textAlign: 'left' }}>Components</h4>
+//       <div className="mb-3" style={{ textAlign: 'left', color: 'grey', fontSize: '0.8rem', fontWeight: '500' }}>
+//         <p> Addresses with Amounts </p>
+//         <textarea
+//           className="form-control"
+//           style={{ background: '#f5f5fa' }}
+//           rows="9"
+//           value={inputText}
+//           onChange={handleInputChange}
+//         />
+//         <p style={{ textAlign: 'left', color: 'grey', fontSize: '0.8rem', fontWeight: '500' }}>
+//           Separate by '=', space, or comma
+//         </p>
+//       </div>
+
+//       {error && (
+//         <div className="alert alert-danger mt-3" role="alert">
+//           <span className='me-3'><i className="fa fa-exclamation-circle" aria-hidden="true"></i></span>
+//           {error}
+//         </div>
+//       )}
+
+//       {result && (
+//         <div className="alert alert-success mt-3" role="alert">
+//           <span className='me-3'><i className="fa fa-check-circle" aria-hidden="true"></i></span>
+//           Input is valid. You can perform further actions here.
+//         </div>
+//       )}
+
+//       {result && (
+//         <div className="result mt-3">
+//           <h5>Result:</h5>
+//           <pre>{JSON.stringify(result, null, 2)}</pre>
+//         </div>
+//       )}
+
+//       {result && (
+//         <div className="result mt-3">
+//           <h5>Processed Address-Value Pairs:</h5>
+//           <ul>
+//             {Array.from(addressValueMap).map(([address, value]) => (
+//               <li key={address}>
+//                 Address: {address}, Value: {value}
+//               </li>
+//             ))}
+//           </ul>
+//         </div>
+//       )}
+
+//       <button className="btn btn-primary mt-3 w-100" onClick={validateInput}>
+//         Next
+//       </button>
+//     </div>
+//   );
+// }
+
+// export default MergeComponents;
 import React, { useState } from 'react';
 
-import 'font-awesome/css/font-awesome.min.css';
-
-function Disperse() {
-  const [inputData, setInputData] = useState('');
+function MergeComponents() {
+  const [inputText, setInputText] = useState('');
   const [error, setError] = useState(null);
-  const [result, setResult] = useState('');
+  const [result, setResult] = useState(null);
+  const [addressValueMap, setAddressValueMap] = useState(new Map());
 
-  const checkForDuplicates = (lines) => {
-    const seenAddresses = new Map();
-    let lineNumber = 1;
-    for (const line of lines) {
-      const [address] = line.split(/\s+/);
-      if (seenAddresses.has(address)) {
-        seenAddresses.get(address).push(lineNumber);
-      } else {
-        seenAddresses.set(address, [lineNumber]);
-      }
-      lineNumber++;
-    }
-    return seenAddresses;
-  };
-
-  const onSubmit = (e) => {
-    e.preventDefault();
+  const handleInputChange = (e) => {
+    setInputText(e.target.value);
     setError(null);
+    setResult(null);
+    setAddressValueMap(new Map());
+  };
 
-    try {
-      const lines = inputData.split('\n').map((line) => line.trim());
-      const seenAddresses = checkForDuplicates(lines);
+  const validateInput = () => {
+    const lines = inputText.split('\n').filter((line) => line.trim() !== '');
+    const addressValueMap = new Map();
+    const errors = [];
+    const validAddresses = [];
 
-      const duplicateAddresses = [];
-      for (const [address, lineNumbers] of seenAddresses.entries()) {
-        if (lineNumbers.length > 1) {
-          duplicateAddresses.push(`${address} encountered duplicate in line ${lineNumbers.join(', ')}`);
-        }
-      }
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const parts = line.split(/[=, ]+/); // Split by '=', space, or comma
 
-      if (duplicateAddresses.length > 0) {
-        throw new Error(`Duplicate addresses:\n${duplicateAddresses.join('\n')}`);
-      }
+      if (parts.length === 2) {
+        const [address, value] = parts;
+        const intValue = parseInt(value, 10);
 
-      const addressBalances = new Map();
-      let balanceMessage = '';
-      let finalResult = '';
-
-      for (let lineNumber = 1; lineNumber <= lines.length; lineNumber++) {
-        const line = lines[lineNumber - 1];
-        const parts = line.split(/\s+/);
-
-        if (parts.length !== 2) {
-          throw new Error(`Line ${lineNumber} has an incorrect format: ` + line);
-        }
-
-        const [address, amount] = parts;
-
-        if (!isValidEthereumAddress(address)) {
-          throw new Error(`Invalid Ethereum address in Line ${lineNumber}: ` + address);
-        }
-
-        if (!isValidNumber(amount)) {
-          throw new Error(`Line ${lineNumber}: ` + amount + ' is an invalid amount');
-        }
-
-        const amountValue = parseFloat(amount);
-
-        if (addressBalances.has(address)) {
-          addressBalances.set(address, addressBalances.get(address) + amountValue);
+        if (!/^0x[0-9a-fA-F]{40}$/.test(address)) {
+          errors.push(`Line ${i + 1}: Invalid Ethereum address: ${address}`);
+        } else if (isNaN(intValue)) {
+          errors.push(` Invalid value: ${value}: inline ${i + 1}`);
         } else {
-          addressBalances.set(address, amountValue);
+          if (addressValueMap.has(address)) {
+            errors.push(` Address ${address} encountered duplicates in line ${i+1}`);
+          } else {
+            addressValueMap.set(address, intValue);
+            validAddresses.push({ address, amount: intValue });
+          }
         }
+      } else {
+        errors.push(`Line ${i + 1}: Incorrect format: ${line}`);
       }
-
-      for (const [address, balance] of addressBalances.entries()) {
-        balanceMessage += `${address}: ${balance.toFixed(2)}\n`;
-      }
-
-      if (balanceMessage) {
-        finalResult += 'Combined Balances\n' + balanceMessage;
-      }
-
-      setResult(finalResult);
-    } catch (err) {
-      setResult('');
-      setError(<span style={{ color: 'red' }}>Error: {err.message}</span>);
     }
-  };
 
-  const isValidEthereumAddress = (address) => {
-    const ethereumAddressRegex = /^(0x)?[0-9a-fA-F]{40}$/;
-    return ethereumAddressRegex.test(address);
-  };
+    if (errors.length > 0) {
+      setError(errors.join('\n'));
+    } else {
+      setError(null);
+    }
 
-  const isValidNumber = (value) => {
-    return !isNaN(parseFloat(value)) && isFinite(value);
+    setResult(validAddresses);
+    setAddressValueMap(addressValueMap);
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-8">
-          <div className="">
-         
-            <div className="card-body">
-              <form onSubmit={onSubmit}>
-                <div className="mb-3" style={{textAlign:'left',color:'grey',fontSize:'0.8rem',fontWeight:'500'}}>
-                   <p> Addresses with Amounts </p>
-                  <textarea
-                    className={`form-control ${error ? 'is-invalid' : ''}`}
-                    style={{background:'#f5f5fa'}}
-                    id="inputData"
-                    rows="9"
-                    value={inputData}
-                    onChange={(e) => {
-                      setInputData(e.target.value);
-                      setError(null);
-                      setResult('');
-                    }}
-                  ></textarea>
-                  <p  style={{textAlign:'left',color:'grey',fontSize:'0.8rem', fontWeight:'500'}}>
-                    Seperated by ',' or '' or '='
-                  </p>
-                  {error && (
-                    <div className={`invalid-feedback border border-danger rounded`}>
-                      
-                      <div className="error-box m-3">
-                        <span className='me-3'><i className="fa fa-exclamation-circle" aria-hidden="true">
-                          
-                        </i></span>
-                        {error}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <button type="submit" className="btn btn-primary w-100">
-                  Next
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+    <div className="container" style={{ width: '60vw' }}>
+      <h4 className="mt-3" style={{ textAlign: 'left' }}></h4>
+      <div className="mb-3" style={{ textAlign: 'left', color: 'grey', fontSize: '0.8rem', fontWeight: '500' }}>
+        <p> Addresses with Amounts </p>
+        <textarea
+          className="form-control"
+          style={{ background: '#f5f5fa' }}
+          rows="9"
+          value={inputText}
+          onChange={handleInputChange}
+        />
+        <p style={{ textAlign: 'left', color: 'grey', fontSize: '0.8rem', fontWeight: '500' }}>
+          Separate by ','or ''or'='
+        </p>
       </div>
-      {result && (
-        <div className="row justify-content-center mt-4">
-          <div className="col-md-8">
-            <div className="card">
-              <div className="card-header bg-primary text-white">
-                <h3>Result</h3>
-              </div>
-              <div className="card-body">
-                <pre>{result}</pre>
-              </div>
-            </div>
-          </div>
+
+      {error && (
+        <div className='row'>
+        
+  <div className="col text-left" style={{ color: "red",textAlign:"left" }}>
+    Duplicate
+  </div>
+  <div className="col text-right" style={{ color: "red",textAlign:"right" }}>
+    Keep the first line | Combine Balance
+  
+</div>
+
+   <div className="alert alert-danger mt-3" role="alert">
+       
+          <span className='me-3'><i className="fa fa-exclamation-circle" aria-hidden="true"></i></span>
+          {error}
+        </div>
         </div>
       )}
+
+      {result && (
+        
+        <div className="alert alert-success mt-3" role="alert">
+          <span className='me-3'><i className="fa fa-check-circle" aria-hidden="true"></i></span>
+          Input is valid. You can perform further actions here.
+        </div>
+        
+      )}
+
+      {result && (
+        <div className="result mt-3">
+          <h5>Result:</h5>
+          <pre>{JSON.stringify(result, null, 2)}</pre>
+        </div>
+      )}
+
+      {result && (
+        <div className="result mt-3">
+          <h5>Processed Address-Value Pairs:</h5>
+          <ul>
+            {Array.from(addressValueMap).map(([address, value]) => (
+              <li key={address}>
+                Address: {address}, Value: {value}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <button className="btn btn-secoundary mt-3 w-100 " style={{background:"purple",color:"white"}} onClick={validateInput}>
+        Next
+      </button>
     </div>
   );
 }
 
-export default Disperse;
-
-
-
+export default MergeComponents;
 
